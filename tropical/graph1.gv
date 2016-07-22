@@ -1,0 +1,50 @@
+digraph add_chain{
+0100 [color=blue];
+2011 [color=blue];
+1020 [style=filled, fillcolor=lightblue];
+0201 [style=filled, fillcolor=lightblue];
+1102 [color=blue];
+0010 [color=blue];
+1020 [style=filled, fillcolor=lightblue];
+0201 [style=filled, fillcolor=lightblue];
+1120 [color=red];
+0001 [color=red];
+0102 [style=filled, fillcolor=red];
+2010 [style=filled, fillcolor=red];
+1000 [color=red];
+0211 [color=red];
+0102 [style=filled, fillcolor=red];
+2010 [style=filled, fillcolor=red];
+1002 [color=green];
+0210 [color=green];
+1100 [style=filled,fillcolor=green];
+0011 [style=filled,fillcolor=green];
+0120 [color=green];
+2001 [color=green];
+1100 [style=filled,fillcolor=green];
+0011 [style=filled,fillcolor=green];
+"0011" -> "0211"
+"0011" -> "2011"
+"0102" -> "1102"
+"0201" -> "0211"
+"1020" -> "1120"
+"1100" -> "1102"
+"1100" -> "1120"
+"2010" -> "2011"
+"0001" -> "0011"
+"0001" -> "0201"
+"0001" -> "2001"
+"0010" -> "0011"
+"0010" -> "2010"
+"0010" -> "0210"
+"0100" -> "0102"
+"0100" -> "1100"
+"0100" -> "0120"
+"0120" -> "1120"
+"0210" -> "0211"
+"2001" -> "2011"
+"1000" -> "1020"
+"1000" -> "1100"
+"1000" -> "1002"
+"1002" -> "1102"
+}

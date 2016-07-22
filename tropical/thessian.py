@@ -1,0 +1,194 @@
+#!/usr/bin/env python
+# -*- coding: iso-8859-15 -*-
+""" Explorations in tropical elliptic curves. 
+
+    See also: 
+    [[Kajiwara et al.][http://arxiv.org/pdf/0903.0331.pdf]].
+    [[Atsushi Nobe][http://www.kurims.kyoto-u.ac.jp/~kyodo/kokyuroku/contents/pdf/1765-14.pdf]]
+
+"""
+
+import matplotlib.pyplot as plt
+
+class TVariety:
+    """Tropical variety."""
+    p = 0
+
+    def __init__(self, prime):
+        self.p = prime
+
+    def mat_maxcount( self ):
+        mat = []
+        for x in range( -self.p, self.p ):
+            row = []
+            for y in range( -self.p, self.p ):
+                sset = self.tequation( x, y )
+                sset_m = max( sset )
+                # Count how many times max is reached
+                sset_c = 0
+                for z in sset:
+                    if sset_m == z :
+                        sset_c += 1
+                # Keep count associated to (x,y) in matrix
+                row += [sset_c]
+            mat += [ row ]
+        return mat
+
+    def singularlocus( self ):
+        mat = self.mat_maxcount()
+        sl  = []
+        for x in range( 2*self.p ):
+            for y in range( 2*self.p ):
+                if mat[x][y] > 1:
+                    sl += [ (x, y, mat[x][y]) ]
+        return sl
+
+    def cycle( self ):
+        mat = self.mat_maxcount()
+        sl  = []
+        for x in range( -self.p, self.p ):
+            for y in range( -self.p, self.p ):
+                if max(3*x, 3*y, 0) == x+y+self.K :
+                    sl += [ (x, y, mat[x][y]) ]
+        return sl
+    
+class THessian( TVariety ):
+    """Tropical elliptic curve in Hessian form."""
+    K = 0
+    
+    def __init__(self, cst, prime):
+        self.p, self.K = prime, cst%prime
+
+    def tequation( self, x, y ):
+        # Equation in tropical Hessian form
+        return [ 3*x, 3*y, (x+y+self.K), 0 ] 
+
+    def tcycle( self ):
+        return self.cycle()
+
+class TLine( TVariety ):
+    """Tropical elliptic curve in Hessian form."""
+    a, b, c = 0, 0, 0
+    
+    def __init__(self, a, b, c, prime):
+        self.p, self.a, self.b, self.c = prime, a%prime, b%prime, c%prime
+
+    def tequation( self, x, y ):
+        # Equation in tropical form
+        return [ (x+self.a) % self.p, (y+self.b) % self.p, self.c ]
+
+
+if __name__ == '__main__':
+    font = {'family': 'serif',
+            'color':  'blue',
+            'weight': 'normal',
+            'size': 10,
+        }
+    K = 101
+    P = 1279
+    plt.title( 'Tropical elliptic curve group law' )
+
+    th = THessian( K, P )
+    # sl =  th.singularlocus()
+    sl = th.tcycle()
+    xcoords = [ x%P for (x, y, val) in sl ]
+    ycoords = [ y%P for (x, y, val) in sl ]
+    plt.plot( xcoords, ycoords, 'r+' )
+    th_points = [ (x%P,y%P) for (x,y,val) in sl ]
+    print th_points
+    
+    # Display special vertices
+    vertices = [ (-K % P, 0 % P, 'V1'),
+                 (0 % P, -K % P, 'V2'),
+                 (K%P, K%P, 'V3') ]
+    # for (vx, vy, s) in vertices :
+    #     plt.plot( vx, vy, 'bo' )
+    #     plt.text( vx, vy+2, s, fontdict=font )
+        
+
+    # Find cycle and edges
+    # tcycle = []
+    # for x in range( th.p ):
+    #     for y in range( th.p ):
+    #         # Cycle with Kajawira's formula
+    #         # if (x+y+th.K)%th.p == max(3*x % th.p, 3*y % th.p, 0) % th.p:
+    #         # Edges
+    #         # if 3*x % th.p == max((x+y+th.K)%th.p, 3*y % th.p, 0):
+    #         if 3*y % th.p == max((x+y+th.K)%th.p, 3*x % th.p, 0):
+    #             tcycle += [ (x, y) ]
+    # print 'Cycle:', tcycle
+    # xcoords = [ x for (x, y) in tcycle ]
+    # ycoords = [ y for (x, y) in tcycle ]
+    # plt.plot( xcoords, ycoords, 'g+' )
+
+    Px, Py = 65, 83 # P is on the curve `th'
+    Qx, Qy = 81, 61
+    plt.plot( Px, Py, 'bo' )
+    plt.text( Px, Py+2, 'P', fontdict=font )
+    plt.plot( Qx, Qy, 'ro' )
+    plt.text( Qx, Qy+2, 'Q', fontdict=font )
+    X, Y, X1, Y1 = Px, Py, Qx, Qy
+    # Nobe's formulas
+    Ptransforms = [
+        ( (max(Y,(2*X+X1+Y1))-max((X+2*X1),(2*Y+Y1))),
+          (max((X+Y+2*Y1),X1)-max((X+2*X1),(2*Y+Y1))),
+          'P1' ),
+        ( (max((X+Y+2*X1),Y1)-max((Y+2*Y1),(2*X+X1))),
+          (max(X,(2*Y+X1+Y1))-max((Y+2*Y1),(2*X+X1))),
+          'P2'  ),
+        ( (max((X+2*Y1),(2*Y+X1))-max((X+Y),(X1+Y1))),
+          (max((Y+2*X1),(2*X+Y1))-max((X+Y),(X1+Y1))),
+          'P3' )
+        ]
+    for (vx, vy, s) in Ptransforms :
+        if (vx,vy) in th_points:
+            plt.plot( vx, vy, 'bo' )
+        else:
+            plt.plot( vx, vy, 'yo' )
+        plt.text( vx, vy+2, s, fontdict=font )
+            
+        print s, vx, vy
+
+    # (PPx, PPy) = ( (Py + 3*max(Px,0) - 3*max(Px,Py)) % th.p,
+    #                (Px + 3*max(Py,0) - 3*max(Px,Py)) % th.p
+    #                )
+    # plt.plot( PPx, PPy, 'bo' )
+    # plt.text( PPx, PPy+2, '2P', fontdict=font )
+
+    # Px, Py = 98, 36 # P is on the curve `th'
+    # plt.plot( Px, Py, 'bo' )
+    # plt.text( Px, Py+2, 'Q', fontdict=font )
+    # (PPx, PPy) = ( (Py + 3*max(Px,0) - 3*max(Px,Py)) % th.p,
+    #                (Px + 3*max(Py,0) - 3*max(Px,Py)) % th.p
+    #                )
+    # plt.plot( PPx, PPy, 'bo' )
+    # plt.text( PPx, PPy+2, '2Q', fontdict=font )
+    
+    s0 = sl
+    
+    # P3x, P3y = 0, 0
+    # for (x, y, val) in sl:
+    #     if val==3:
+    #         P3x, P3y = x, y
+
+    # tl = TLine( 63, 37, 97, 127 )
+    # sl =  tl.singularlocus()
+    # xcoords = [ x for (x, y, val) in sl ]
+    # ycoords = [ y for (x, y, val) in sl ]
+    # plt.plot( xcoords, ycoords, 'b+' )
+
+    # print 'Triple pt: (%d,%d)' % (P3x, P3y)
+    # print 'Intersect:', set(s0).intersection( sl )
+    # for (px, py, pval) in set(s0).intersection( sl ):
+    #     plt.plot( px, py, 'bo' )
+    # plt.plot( P3x, P3y, 'ro' )
+
+    # t2 = TLine( 26, 26, 101, 127 )
+    # sl =  t2.singularlocus()
+    # xcoords = [ x for (x, y, val) in sl ]
+    # ycoords = [ y for (x, y, val) in sl ]
+    # plt.plot( xcoords, ycoords, 'g+' )
+    
+    # print 'Intersect:', set(s0).intersection( sl )
+    
+    plt.show()

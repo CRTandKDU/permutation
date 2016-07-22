@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: iso-8859-15 -*-
+""" Exploring the Tropical Hesse curve
+
+    See also: 
+    [[Kajiwara et al.][http://arxiv.org/pdf/0903.0331.pdf]].
+    [[Atsushi Nobe][http://www.kurims.kyoto-u.ac.jp/~kyodo/kokyuroku/contents/pdf/1765-14.pdf]]
+    [[Atsushi Nobe][http://arxiv.org/pdf/1111.0131.pdf]]
+
+"""
+
+import matplotlib.pyplot as plt
+import numpy as np

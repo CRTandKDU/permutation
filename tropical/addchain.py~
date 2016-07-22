@@ -1,0 +1,29 @@
+"""@package Tropical
+Exploration of group-based encryption in the tropical semiring.
+
+Exploring add chains for tropical hessian group law.
+
+"""
+
+global pos, neg
+
+neg = [ "0011", "0102", "0201", "1020", "1100", "2010" ]
+
+def hamming( s1, s2 ):
+    if len(s1) != len(s2):
+        return -1
+    h = 0
+    for i in range(len(s1)):
+        h += abs( int(s1[i])-int(s2[i]) )
+    return h
+
+if __name__ == '__main__':
+    s = "     "
+    for s2 in neg:
+        s += "%5s" % (s2)
+    print s
+    for s1 in neg:
+        s = "%5s" % (s1)
+        for s2 in neg:
+            s += "%5d" % (hamming(s1, s2))
+        print s
